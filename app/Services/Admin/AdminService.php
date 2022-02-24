@@ -34,15 +34,16 @@ class AdminService
         }
     }
 
-    public function userBlock()
+    public function userBlock(int $id)
     {
         $user = User::find($id);
-        if ($user->isAdmin()) {
+        if ($user->isAdmin() || $user->isOrganizer()){
             //добавить потом экзепшн
         } else {
             $user         = User::find($id);
-            $user->status = 0;
+            $user->active = 0;
             $user->save();
         }
+        return $user;
     }
 }

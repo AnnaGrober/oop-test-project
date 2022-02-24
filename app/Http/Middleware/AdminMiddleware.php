@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class AdminMiddleware
 {
@@ -14,12 +13,21 @@ class AdminMiddleware
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|mixed
      */
-    public function handle($request, Closure $next)
-    {
-        if (Auth::user()->isAdmin()) {
+    public function handle($request, Closure $next, ... $roles)
+    {   dd($roles);
+        if (Auth::user() && Auth::user()->isAdmin()) {
             return $next($request);
-        } else {
-            return redirect('/home');
         }
+
+        foreach($roles as $role) {
+            // Check if user has the role This check will depend on how your roles are set up
+            $user = Auth::user();
+
+            if($user->hasRole($role)) {
+                return $next($request);
+            }
+        }
+
+        return redirect('login');
     }
 }

@@ -25,11 +25,15 @@ Route::middleware(['auth'])->prefix('cabinet')->namespace('\App\Http\Controllers
     Route::get('/user', 'UserController@getUser')->name('user');
 });
 
-Route::middleware(['admin'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
+Route::middleware(['admin:organizer'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
+    Route::get('/',  'OrganizerController@getUsers')->name('admin');
+    Route::post('/user/block',  'OrganizerController@userBlock');
+});
+
+Route::middleware(['admin:admin'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
     Route::get('/',  'AdminController@getUsers')->name('admin');
-    Route::get('/user/create',  'AdminController@getCreateUserForm')->name('user_create');;
+    Route::get('/user/create',  'AdminController@getCreateUserForm')->name('user_create');
     Route::post('/user/create',  'AdminController@userCreate');
     Route::post('/user/delete',  'AdminController@userDelete');
-    Route::post('/user/block',  'AdminController@userBlock');
 });
 

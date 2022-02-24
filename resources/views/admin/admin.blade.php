@@ -41,10 +41,8 @@
                             {{$role->name.' '}}
                         @endforeach</td>
                     <td>
-                        <!-- Call to action buttons -->
-
                         {!! Form::submit($user->id, ['class' => 'btn btn-xs btn-danger','value' => $user->id,'id' => $user->id] ) !!}
-
+                        {!! Form::submit($user->id, ['class' => 'btn btn-xs btn-info','value' => $user->id,'id' => $user->id] ) !!}
                     </td>
                 </tr>
             @endforeach
@@ -62,6 +60,23 @@
 
             $.ajax({
                 url: '/admin/user/delete/',
+                type: 'POST',
+                data:{
+                    "_token" : "{{csrf_token()}}",
+                    'X-CSRF-TOKEN':"{{csrf_token()}}",
+                    'id' :id
+                },
+                success:function(response){
+                    $("#success").html(response.message)
+                },
+            });
+        });
+        $('.btn-info').click( function(e){
+            e.preventDefault();
+            var id =  $(this).val();
+
+            $.ajax({
+                url: '/admin/user/block/',
                 type: 'POST',
                 data:{
                     "_token" : "{{csrf_token()}}",
