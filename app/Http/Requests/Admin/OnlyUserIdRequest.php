@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\ServiceProvider;
 
-class UserDeleteRequest extends FormRequest
+class OnlyUserIdRequest extends FormRequest
 {
     public function authorize()
     {

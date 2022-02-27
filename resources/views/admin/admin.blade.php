@@ -14,8 +14,9 @@
                                 {{ session('status') }}
                             </div>
                         @endif
-
-                        <a href="{{ route('user_create') }}"> Добавить юзера </a> <br>
+                        @if ($admin)
+                            <a href="{{ route('user_create') }}"> Добавить юзера </a> <br>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -41,8 +42,9 @@
                             {{$role->name.' '}}
                         @endforeach</td>
                     <td>
-                        {!! Form::submit($user->id, ['class' => 'btn btn-xs btn-danger','value' => $user->id,'id' => $user->id] ) !!}
+                        @if ($admin) {!! Form::submit($user->id, ['class' => 'btn btn-xs btn-danger','value' => $user->id,'id' => $user->id] ) !!} @endif
                         {!! Form::submit($user->id, ['class' => 'btn btn-xs btn-info','value' => $user->id,'id' => $user->id] ) !!}
+                        @if ($organizer) {!! Form::submit($user->id, ['class' => 'btn btn-xs btn-success','value' => $user->id,'id' => $user->id] ) !!} @endif
                     </td>
                 </tr>
             @endforeach
@@ -53,37 +55,54 @@
 @endsection
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        $('.btn-danger').click( function(e){
+    document.addEventListener('DOMContentLoaded', function() {
+        $('.btn-danger').click(function(e) {
             e.preventDefault();
-            var id =  $(this).val();
+            var id = $(this).val();
 
             $.ajax({
-                url: '/admin/user/delete/',
-                type: 'POST',
-                data:{
-                    "_token" : "{{csrf_token()}}",
-                    'X-CSRF-TOKEN':"{{csrf_token()}}",
-                    'id' :id
+                url:     '/admin/user/delete/',
+                type:    'POST',
+                data:    {
+                    "_token":       "{{csrf_token()}}",
+                    'X-CSRF-TOKEN': "{{csrf_token()}}",
+                    'id':           id,
                 },
-                success:function(response){
+                success: function(response) {
                     $("#success").html(response.message)
                 },
             });
         });
-        $('.btn-info').click( function(e){
+        $('.btn-success').click(function(e) {
             e.preventDefault();
-            var id =  $(this).val();
+            var id = $(this).val();
 
             $.ajax({
-                url: '/admin/user/block/',
-                type: 'POST',
-                data:{
-                    "_token" : "{{csrf_token()}}",
-                    'X-CSRF-TOKEN':"{{csrf_token()}}",
-                    'id' :id
+                url:     '/admin/user/invite/',
+                type:    'POST',
+                data:    {
+                    "_token":       "{{csrf_token()}}",
+                    'X-CSRF-TOKEN': "{{csrf_token()}}",
+                    'id':           id,
                 },
-                success:function(response){
+                success: function(response) {
+                    $("#success").html(response.message)
+                },
+            });
+        });
+        $('.btn-info').click(function(e) {
+            e.preventDefault();
+            var id = $(this).val();
+
+            $.ajax({
+                url:     '/admin/user/block/',
+                type:    'POST',
+                data:    {
+                    "_token":       "{{csrf_token()}}",
+                    'X-CSRF-TOKEN': "{{csrf_token()}}",
+                    'id':           id,
+                },
+                success: function(response) {
                     $("#success").html(response.message)
                 },
             });

@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+\Illuminate\Support\Facades\Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
@@ -25,13 +25,17 @@ Route::middleware(['auth'])->prefix('cabinet')->namespace('\App\Http\Controllers
     Route::get('/user', 'UserController@getUser')->name('user');
 });
 
-Route::middleware(['admin:organizer'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
-    Route::get('/',  'OrganizerController@getUsers')->name('admin');
-    Route::post('/user/block',  'OrganizerController@userBlock');
+
+Route::middleware(['role:organizer,admin'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
+    Route::get('/',  'AdminController@getUsers')->name('admin');
+    Route::post('/user/block',  'AdminController@userBlock');
 });
 
-Route::middleware(['admin:admin'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
-    Route::get('/',  'AdminController@getUsers')->name('admin');
+Route::middleware(['role:organizer'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
+    Route::post('/user/invite',  'OrganizerController@userInvite');
+});
+
+Route::middleware(['role:admin'])->prefix('admin')->namespace('\App\Http\Controllers\Admin')->group(function () {
     Route::get('/user/create',  'AdminController@getCreateUserForm')->name('user_create');
     Route::post('/user/create',  'AdminController@userCreate');
     Route::post('/user/delete',  'AdminController@userDelete');

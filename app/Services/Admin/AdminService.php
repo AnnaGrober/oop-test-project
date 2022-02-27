@@ -4,46 +4,73 @@ namespace App\Services\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Event;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class AdminService
 {
 
-    public function getUsers()
+    /**
+     * @return Collection
+     */
+    public function getUsers(): Collection
     {
         return User::with('roles')->get();
     }
 
-    public function userCreate(array $data)
+    /**
+     * @param array $data
+     *
+     * @return User
+     */
+    public function userCreate(array $data): User
     {
         $user = new User($data);
         $user->save();
         if ($data['organizer']) {
-            $user->roles()->attach([config('params.organizer_id')]);
+            DB::transaction(function ($e) use ($user) {
+                $user->roles()->attach([config('params.organizer_id')]);
+                $event = new Event(['organizer_id' => $user->id]);
+                $event->save();
+            });
         }
 
         return $user;
     }
 
+    /**
+     * @param int $id
+     *
+     * @return void
+     */
     public function userDelete(int $id)
     {
         $user = User::find($id);
-        if ($user->isAdmin()) {
-            //добавить потом экзепшн
+        if ($user->hasRole('admin')) {
+            abort(403, 'Access denied');
         } else {
             return User::find($id)->delete();
         }
     }
 
-    public function userBlock(int $id)
+    /**
+     * @param int $id
+     *
+     * @return User
+     */
+    public function userBlock(int $id): User
     {
         $user = User::find($id);
-        if ($user->isAdmin() || $user->isOrganizer()){
-            //добавить потом экзепшн
+        if ($user->hasRole('admin') || $user->hasRole('organizer')) {
+            abort(403, 'Access denied');
         } else {
             $user         = User::find($id);
             $user->active = 0;
             $user->save();
         }
+
         return $user;
     }
+
 }

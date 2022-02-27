@@ -51,13 +51,20 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'users_roles');
     }
 
+    /**
+     * @param $value
+     *
+     * @return void
+     */
     public function setPasswordAttribute($value){
         $this->attributes['password'] = Hash::make($value);
     }
 
-    public function isAdmin() {
-        return $this->roles()->where('name', 'admin')->exists();
-    }
+    /**
+     * @param $role
+     *
+     * @return mixed
+     */
     public function hasRole($role) {
         return $this->roles()->where('name', $role)->exists();
     }
